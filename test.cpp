@@ -11,10 +11,21 @@
 //
 
 
+int display_ctr = 0;
 const int max_input = 5;
 int time_elapsed = 0;
 
+
+//for checking...
+int max_loop=max_input;
+
 //=====================================================================
+
+struct data_display{	
+	int process_number;
+	int from;
+	int to;
+};
 
 struct data_FCFS{	
 	int process_number;
@@ -47,6 +58,7 @@ struct data_FCFS data_input_FCFS[max_input];
 struct data_SJF data_input_SJF [max_input];
 struct data_SJF data_input_PSSJFAT[max_input];
 
+struct data_display display[20];
 //=====================================================================
 
 
@@ -71,13 +83,14 @@ void initialize_input_FCFS(){
 		
 		data_input_FCFS[ctr].started_at = 0;
 		data_input_FCFS[ctr].ended_at = 0;	
+	
 	}
 	
-		data_input_FCFS[ctr].process_number = 0;
-		data_input_FCFS[ctr].cpu_burst = 0;
-		data_input_FCFS[ctr].arrival_time = 0;	
+		data_input_FCFS[ctr+1].process_number = 0;
+		data_input_FCFS[ctr+1].cpu_burst = 0;
+		data_input_FCFS[ctr+1].arrival_time = 0;	
 		
-	
+	printf("\n\nFINAL,-->%d",data_input_FCFS[ctr+1].cpu_burst);
 }
 
 void initialize_input_SJF(){
@@ -92,51 +105,84 @@ void initialize_input_PSSJFAT(){
 
 
 
-void simulate_FCFS(){
-	int ctr = 0;
-	int num_input = 0;
-	int processing = 0;
-	bool done = false;
-
-
-//checking max input
-	while(data_input_FCFS[ctr].process_number!=0){	
-		ctr++;
+void display_result(){
+//	0 value is waiting time.
+	for(int ctr = 0; ctr<display_ctr;ctr++){
+		printf("\n Process --> %d",display[ctr].process_number);
 	}
 	
-	num_input = ctr;	
+}
+
+
+void simulate_FCFS(){
+	int ctr = 0;
+	int processing = 0;
+	int min_arrival_time = 0;
+	int elapsed_time = 0;
+	bool done = false;
+	bool initial_check = false;
+
+	
 	ctr =0;
 	
 	
-	while(done!=true){
-		
+	while(done!=true && max_loop != 0  ){
+		max_loop --;
+	
 //checking if its done...
-		for(int ctr3=0;ctr3<num_input;ctr3++){
+	while(data_input_FCFS[ctr].process_number!=0){	
+		
 			if(data_input_FCFS[ctr].cpu_burst != 0){
 				break;
 			}
-			else if(ctr3 == num_input){
+			if(data_input_FCFS[ctr].process_number==0){
 				done = true;
-				
-			}			
+			}
+			
+		ctr++;			
 		}
+		
+		
+		
+		
+		
+		
+		
 		
 		
 //checking what process should be next
-		while(data_input_FCFS[ctr].process_number!=0){			
-			if(data_input_FCFS[ctr].cpu_burst != 0){
-				
-			}
-			
+		while(data_input_FCFS[ctr].process_number!=0){	
+//		checks for the next process that have not yet been processed		
+			if(data_input_FCFS[ctr].cpu_burst != 0 && data_input_FCFS[ctr].arrival_time < min_arrival_time ){	
+			min_arrival_time = data_input_FCFS[ctr].arrival_time;
+//			processing = data_input_FCFS[ctr].process_number;
+			processing = ctr;	
+			}			
 			ctr++;
 		}
-	
 		
+//reseting		
+		min_arrival_time = 0;
+		processing = 0;
 	
+//simulates doing the process by decrementing the cpu burst of the process into 0
+//elapsed time is then incremented signifying the current time after the processes
+		display[display_ctr].process_number= data_input_FCFS[processing].process_number;
+
+//recording from - this is before process is done
+		display[display_ctr].from = elapsed_time;
+//recprdign to - this is after the process is done		
+		elapsed_time += data_input_FCFS[processing].cpu_burst ;
+		display[display_ctr].to = elapsed_time;
+//CPU burst is now zero since the process is done		
+		data_input_FCFS[processing].cpu_burst = 0;
+		
+//increments display counter to record new process
+		display_ctr++;
 
 
-		time_elapsed++;
-		ctr++;
+
+
 		
 	}
 	
@@ -154,9 +200,10 @@ void simulate_FCFS(){
 
 int main(){
 	
-	printf("test");
+
 	initialize_input_FCFS();
 	simulate_FCFS();
+	display_result();
 return 0;	
 	
 }
