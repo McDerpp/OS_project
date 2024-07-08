@@ -126,6 +126,8 @@ void display_result()
     }
 }
 
+
+//not efficient, should consider merging the checking of done and minimum arrival to have less loops
 void simulate_FCFS()
 {
     int ctr = 0;
@@ -134,7 +136,10 @@ void simulate_FCFS()
     bool done = false;
     int min_arrival_time = 0;
     while (!done)
-    { 
+    //remove the num_input >= loop_ctr for final
+    {
+  
+
         // checking if its done...
         while (data_input_FCFS[ctr].process_number != 0)
         {
