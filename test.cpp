@@ -22,6 +22,8 @@ struct data_display
 
 struct data_FCFS
 {
+    // process_number -> 100 == waiting
+    // process_number -> 0 == done
     int process_number;
     int cpu_burst;
     int arrival_time;
@@ -139,25 +141,36 @@ void simulate_FCFS()
         // reseting
         ctr = 0;
         
+        
+
+
 
         // checking what process should be next
         while (data_input_FCFS[ctr].process_number != 0)
         {
-
-            // checks for the next process that has not yet been processed
+        // checks for the next process that has not yet been processed
             if (data_input_FCFS[ctr].cpu_burst != 0 && data_input_FCFS[ctr].arrival_time <= min_arrival_time)
             {
-
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
                 // processing = data_input_FCFS[ctr].process_number;
                 processing = ctr;
             }
             
-            
             ctr++;
         }
+        
+        // checking elapsed time if a procces had arrived 
+        // adding another process for waiting time
+        if(elapsed_time < min_arrival_time ){
+            display_ctr++;
+        
+        // process number 100 signifies a waiting time/gap in between processes(if it occurs)
+        display[display_ctr].process_number = 100;
+            
+            
+        }
+        
 
-        // resetting
  
         
 
