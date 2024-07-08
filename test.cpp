@@ -134,10 +134,7 @@ void simulate_FCFS()
     bool done = false;
     int min_arrival_time = 0;
     while (!done)
-    //remove the num_input >= loop_ctr for final
-    {
-  
-
+    { 
         // checking if its done...
         while (data_input_FCFS[ctr].process_number != 0)
         {
