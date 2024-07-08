@@ -48,6 +48,7 @@ struct data_display
 {
     struct data_FCFS fcfs_data;
     int process_number;
+    int CPU_burst_left;
     int from;
     int to;
     
@@ -110,9 +111,13 @@ void display_result()
         printf("\n\n------------------------ Processing[%d]------------------------", ctr);
         if(display[ctr].fcfs_data.process_number != 100){
         printf("\n Process Number-> %d", display[ctr].fcfs_data.process_number);
+        printf("\n CPU Burst Time left-> %d", display[ctr].CPU_burst_left);
         }
-        else
-        printf("\n CPU Burst Time left-> %d", display[ctr].fcfs_data.cpu_burst);
+        else{
+           printf("\n Process Number-> Waiting... "); 
+           printf("\n CPU Burst Time left->  Waiting..." );
+        }
+        
         printf("\n Started -> %d", display[ctr].from);
         printf("\n ended --> %d", display[ctr].to);
         
@@ -131,6 +136,7 @@ void simulate_FCFS()
     int loop_ctr = 0;
     int min_arrival_time = 0;
     while (!done && num_input >= loop_ctr)
+    //remove the num_input >= loop_ctr for final
     {
         loop_ctr++;
 
@@ -203,7 +209,8 @@ void simulate_FCFS()
         elapsed_time += data_input_FCFS[processing].cpu_burst;
         display[display_ctr].to = elapsed_time;
         // CPU burst is now zero since the process is done
-        data_input_FCFS[processing].cpu_burst = 0;
+        display[display_ctr].CPU_burst_left = 0;
+        data_input_FCFS[ctr].cpu_burst =0;
 
         // increments display counter to record new process
         display_ctr++;
