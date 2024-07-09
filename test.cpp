@@ -82,16 +82,10 @@ void initialize_input_FCFS()
         printf("Enter Arrival Time: ");
         scanf("%d", &data_input_FCFS[ctr].arrival_time);
         printf("\n");
-
-
-
     }
-
     data_input_FCFS[ctr + 1].process_number = 0;
     data_input_FCFS[ctr + 1].cpu_burst = 0;
     data_input_FCFS[ctr + 1].arrival_time = 0;
-
-    printf("\n\nFINAL,-->%d", data_input_FCFS[ctr + 1].cpu_burst);
 }
 
 void initialize_input_SJF()
@@ -137,17 +131,14 @@ void simulate_FCFS()
     bool isInitialized = false;
     int min_arrival_time = 0;
     while (!done)
-    //remove the num_input >= loop_ctr for final
     {
   
-        printf("---------------\n");
+
         // checking if its done...
         while (data_input_FCFS[ctr].process_number != 0)
         {
             // checking if one of the process still have CPU burst time
-            printf("cpu value --> %d\n",data_input_FCFS[ctr].cpu_burst );
             if (data_input_FCFS[ctr].cpu_burst != 0){
-
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
                 //incrementing to check the process 1 index ahead(this is to check if the end process indicator(process number 0 is next, then it means this is the last process))
                 ctr++;
@@ -156,10 +147,12 @@ void simulate_FCFS()
             ctr++;
         }
         
-        if (data_input_FCFS[ctr].process_number == 0 && data_input_FCFS[ctr].cpu_burst == 0)
+        
+        if (data_input_FCFS[ctr].process_number == 0)
             {
                 done = true;
             }
+            
             
         // reseting to be reused on other counter
         ctr = 0;
@@ -168,62 +161,47 @@ void simulate_FCFS()
         // checking what process should be next which depends on what process does still has a CPU burst time and also with the minimum arrival time(minimum arrival time == next process)
         while (data_input_FCFS[ctr].process_number != 0)
         {
-           printf("Checking cpu[%d] %d\n",data_input_FCFS[ctr].process_number,data_input_FCFS[ctr].cpu_burst);
+     
         // checks for the next process that has not yet been processed
             if (data_input_FCFS[ctr].cpu_burst != 0 && data_input_FCFS[ctr].arrival_time <= min_arrival_time)
             {
-             
             // initialization  
             if(isInitialized == false){
                 isInitialized = true;
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
                 processing = ctr;
-                printf("INITIALIZE\n");
+
             }
             // if same arrival time, process number takes precedence
             else if(min_arrival_time == data_input_FCFS[ctr].arrival_time && processing>ctr){
-                printf("PROCESS NUMBER PRECEDENCE\n");
-            //do nothing
-            }
-            
-  
-                
-            else if(min_arrival_time != data_input_FCFS[ctr].arrival_time) {
+            //do nothing(skip since its checking process to process therefore it is expected that this has more priority number)
+                    }
+            // under normal cirumstances(arrival time is not the same)
+             else if(min_arrival_time != data_input_FCFS[ctr].arrival_time) {
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
                 processing = ctr;
-                printf("OTHERS\n");
-            }
-            
-            
-            }
-            
-            
-            
-            
-            
+                    }
+                }
+            // increment counter to move to check the next process 
             ctr++;
         }
         
         // checking elapsed time if a procces had arrived 
         // adding another process for waiting time
         if(elapsed_time < min_arrival_time ){
-        
         // process number 100 signifies a waiting time/gap in between processes(if it occurs)
         display[display_ctr].fcfs_data.process_number = 100;
         // it starts at the current elapsed time
         display[display_ctr].from = elapsed_time;
-        
         
         // elapsed time added with the process next in line to process to simulate waiting
         // suppose current elapsed time is 0 and next process arrival time is 5, therefore
         // 0 + 5 -> elapsed time = 5 and the next process starts at 5(explained in the next part)
         elapsed_time +=  (min_arrival_time - elapsed_time);
         display[display_ctr].to = elapsed_time;
-        
         // for displaying ctr
         display_ctr++;
         }
-        
 
         display[display_ctr].fcfs_data = data_input_FCFS[processing];
         // tracking of what process number is being processed
