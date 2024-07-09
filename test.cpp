@@ -12,6 +12,7 @@ int processing = 0;
 int elapsed_time = 0;
 bool done = false;
 bool isInitialized = false;
+bool isInitialized_preempt = false;
 int min_arrival_time = 0;
 int preempt = 0;
 
@@ -135,7 +136,6 @@ void get_minimum_AT()
             isInitialized = true;
             min_arrival_time = data_input_FCFS[ctr].arrival_time;
             processing = ctr;
-    
         }
                 // if same arrival time, process number takes precedence
         else if(min_arrival_time == data_input_FCFS[ctr].arrival_time && processing>ctr){
@@ -190,48 +190,47 @@ void check_done(){
 }
 
 void check_preepmt(){
-    
+    int preempt_ctr = 0;
     int preempt_min_arrival = 0;
-    while (data_input_FCFS[ctr].process_number != 0){
+    while (data_input_FCFS[preempt_ctr].process_number != 0){
+
         
         //conditions
         //must not be the min_arrival_time
         //cpu burst time is not 0
         //arrival time is less than the preempt min arrival time(next minimum arrival time next to the actual one)
-        if(ctr!=processing && data_input_FCFS[ctr].cpu_burst != 0 && data_input_FCFS[ctr].arrival_time <= preempt_min_arrival){
-            
+        if(preempt_ctr != processing && data_input_FCFS[preempt_ctr].cpu_burst != 0 ){
              // initialization  
-        if(isInitialized == false){
-            isInitialized = true;
-            preempt_min_arrival = data_input_FCFS[ctr].arrival_time;
-            preempt = ctr;
+        if(isInitialized_preempt == false){
+            printf("INITIALIZED!\n");
+            isInitialized_preempt = true;
+            preempt_min_arrival = data_input_FCFS[preempt_ctr].arrival_time;
+            preempt = preempt_ctr;
     
         }
                 // if same arrival time, process number takes precedence
-        else if(preempt_min_arrival == data_input_FCFS[ctr].arrival_time && preempt>ctr){
+        else if(preempt_min_arrival == data_input_FCFS[preempt_ctr].arrival_time && preempt>preempt_ctr){
+            printf("non!\n");
         //do nothing(skip since its checking process to process therefore it is expected that this has more priority number)
                 }
                 // under normal cirumstances(arrival time is not the same)
-         else if(preempt_min_arrival != data_input_FCFS[ctr].arrival_time) {
-            preempt_min_arrival = data_input_FCFS[ctr].arrival_time;
-            preempt = ctr;
+         else if(preempt_min_arrival > data_input_FCFS[preempt_ctr].arrival_time) {
+             printf("OTHERS!\n");
+            preempt_min_arrival = data_input_FCFS[preempt_ctr].arrival_time;
+            preempt = preempt_ctr;
+
                 }
+             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
+                  printf("will preempt at  %d\n",preempt_min_arrival);      
             
             if(elapsed_time + data_input_FCFS[processing].cpu_burst){
             
             }
         }
+        preempt_ctr++;
         }
+        
 }
 
 void reset_variables(){
@@ -300,6 +299,7 @@ void simulate_SJF()
         check_done();
         get_minimum_AT();
         simulate_wait();
+        check_preepmt();
         
         display[display_ctr].fcfs_data = data_input_FCFS[processing];
         display[display_ctr].process_number = data_input_FCFS[processing].process_number;
@@ -310,13 +310,7 @@ void simulate_SJF()
         data_input_FCFS[processing].cpu_burst =0;
         
 
-        // increments display counter to record new process
-        display_ctr++;
-        
-        // full reset
-        processing = 0;
-        ctr =0;
-        isInitialized = false;
+        loop_reset();
     }
 }
 
@@ -332,7 +326,8 @@ void simulate_SJF()
 int main()
 {
     initialize_input_FCFS();
-    simulate_FCFS();
+    // simulate_FCFS();
+    simulate_SJF();
     display_result();
     return 0;
 }
