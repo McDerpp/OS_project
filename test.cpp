@@ -7,11 +7,8 @@
 int display_ctr = 0;
 int time_elapsed = 0;
 
-// for checking...
-int max_loop = MAX_INPUT;
 int num_input = 0;
 
-//=====================================================================
 
 
 
@@ -132,8 +129,7 @@ void simulate_FCFS()
     int min_arrival_time = 0;
     while (!done)
     {
-  
-
+        printf("testing");
         // checking if its done...
         while (data_input_FCFS[ctr].process_number != 0)
         {
