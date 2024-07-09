@@ -231,9 +231,16 @@ void simulate_FCFS()
 
 // check for process with minimum arrival time
 // execute process up until to the next minimum arrival time
+//CPU burst time of the current process being executed will be deducted to the time elapsed up until the next minimum arrival time.
 // check for the process of minimum arrival
 // this scenario may print mulitple display of certain process consecutively if no other process arrived or no CPU burst less than the process currently executed.
 // to solve this issue, consecutive occurance of process will be merged, the next display in queue will be checked if the process number is the same, if so it will be merged.
+//hiearchy of variables to consider arrival_time > CPU_burst_time > process_number
+// therefore i would be comparing the arrival time with elapsed time
+//if more than 1 process has arrival_time<elapsed_time then we compare for the CPU_burst_time
+//this will determine the next process to be executed.
+//if they both have the same CPU_burst_time then we compare for the process_number
+//
 void simulate_SJF()
 {
     int ctr = 0;
@@ -281,7 +288,6 @@ void simulate_SJF()
                 isInitialized = true;
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
                 processing = ctr;
-
             }
             // if same arrival time, process number takes precedence
             else if(min_arrival_time == data_input_FCFS[ctr].arrival_time && processing>ctr){
