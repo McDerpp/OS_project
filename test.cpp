@@ -105,7 +105,7 @@ void initialize_input_PSSJFAT()
 void display_result()
 {
     // 0 value is waiting time.
-    for (int ctr = 0; ctr < display_ctr-1; ctr++)
+    for (int ctr = 0; ctr < display_ctr; ctr++)
     {
        
         printf("\n\n------------------------ Processing[%d]------------------------", ctr);
@@ -134,17 +134,20 @@ void simulate_FCFS()
     int processing = 0;
     int elapsed_time = 0;
     bool done = false;
+    bool isInitialized = false;
     int min_arrival_time = 0;
     while (!done)
     //remove the num_input >= loop_ctr for final
     {
   
-
+        printf("---------------\n");
         // checking if its done...
         while (data_input_FCFS[ctr].process_number != 0)
         {
             // checking if one of the process still have CPU burst time
-            if (data_input_FCFS[ctr].cpu_burst != 0)
+            printf("cpu value --> %d\n",data_input_FCFS[ctr].cpu_burst );
+            if (data_input_FCFS[ctr].cpu_burst != 0){
+
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
                 //incrementing to check the process 1 index ahead(this is to check if the end process indicator(process number 0 is next, then it means this is the last process))
                 ctr++;
@@ -165,13 +168,38 @@ void simulate_FCFS()
         // checking what process should be next which depends on what process does still has a CPU burst time and also with the minimum arrival time(minimum arrival time == next process)
         while (data_input_FCFS[ctr].process_number != 0)
         {
+           printf("Checking cpu[%d] %d\n",data_input_FCFS[ctr].process_number,data_input_FCFS[ctr].cpu_burst);
         // checks for the next process that has not yet been processed
             if (data_input_FCFS[ctr].cpu_burst != 0 && data_input_FCFS[ctr].arrival_time <= min_arrival_time)
             {
+             
+            // initialization  
+            if(isInitialized == false){
+                isInitialized = true;
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
-               
                 processing = ctr;
+                printf("INITIALIZE\n");
             }
+            // if same arrival time, process number takes precedence
+            else if(min_arrival_time == data_input_FCFS[ctr].arrival_time && processing>ctr){
+                printf("PROCESS NUMBER PRECEDENCE\n");
+            //do nothing
+            }
+            
+  
+                
+            else if(min_arrival_time != data_input_FCFS[ctr].arrival_time) {
+                min_arrival_time = data_input_FCFS[ctr].arrival_time;
+                processing = ctr;
+                printf("OTHERS\n");
+            }
+            
+            
+            }
+            
+            
+            
+            
             
             ctr++;
         }
@@ -212,6 +240,7 @@ void simulate_FCFS()
         // CPU burst is now zero since the process is done
         display[display_ctr].CPU_burst_left = 0;
         data_input_FCFS[processing].cpu_burst =0;
+        
 
         // increments display counter to record new process
         display_ctr++;
@@ -219,6 +248,7 @@ void simulate_FCFS()
         // full reset
         processing = 0;
         ctr =0;
+        isInitialized = false;
     }
 }
 
