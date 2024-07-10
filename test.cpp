@@ -350,7 +350,9 @@ void simulate_SJF()
                 waiting_ctr++;
             }
 
-
+        display[display_ctr].from = elapsed_time;
+        display[display_ctr].fcfs_data = data_input_FCFS[processing];
+        display[display_ctr].process_number = data_input_FCFS[processing].process_number;
 
         if(isPreempt == true){
             data_input_FCFS[processing].cpu_burst -= data_input_FCFS[preempt].arrival_time - elapsed_time;
@@ -359,24 +361,13 @@ void simulate_SJF()
 
         if (isPreempt == false) {
             elapsed_time += data_input_FCFS[processing].cpu_burst;
-            data_input_FCFS[processing].cpu_burst =0;
-            
+            data_input_FCFS[processing].cpu_burst =0;            
         }
 
-        display[display_ctr].fcfs_data = data_input_FCFS[processing];
 
-
-        display[display_ctr].process_number = data_input_FCFS[processing].process_number;
-        display[display_ctr].from = elapsed_time;
-        //subtracting the cpu burst
-
-
-
-        display[display_ctr].to = preempt_arrival;
+        display[display_ctr].to = elapsed_time;
         display[display_ctr].CPU_burst_left = data_input_FCFS[processing].cpu_burst;
 
-        printf(" CPU Burst -->%d\n", data_input_FCFS[processing].cpu_burst);
-        printf(" Elapsed_Time -->%d\n\n\n", elapsed_time);
 
         loop_reset();
         preempt_ctr = 0;
