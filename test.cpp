@@ -14,7 +14,9 @@ bool done = false;
 bool isInitialized = false;
 bool isInitialized_preempt = false;
 int min_arrival_time = 0;
+int preempt_min_arrival = 0;
 int preempt = 0;
+
 
 
 
@@ -191,8 +193,8 @@ void check_done(){
 
 void check_preepmt(){
     int preempt_ctr = 0;
-    int preempt_min_arrival = 0;
     while (data_input_FCFS[preempt_ctr].process_number != 0){
+ 
 
         
         //conditions
@@ -222,15 +224,16 @@ void check_preepmt(){
                 }
              
             
-                  printf("will preempt at  %d\n",preempt_min_arrival);      
+                  
             
             if(elapsed_time + data_input_FCFS[processing].cpu_burst){
             
             }
         }
         preempt_ctr++;
+
         }
-        
+        printf("will preempt at  %d\n",preempt_min_arrival);      
 }
 
 void reset_variables(){
@@ -259,6 +262,7 @@ void simulate_FCFS()
 {
     while (!done)
     {
+
         check_done();
         get_minimum_AT();
         simulate_wait();
@@ -294,6 +298,8 @@ void simulate_FCFS()
 //
 void simulate_SJF()
 {
+    // still has issues
+    printf("simulating");
        while (!done)
     {
         check_done();
@@ -304,11 +310,14 @@ void simulate_SJF()
         display[display_ctr].fcfs_data = data_input_FCFS[processing];
         display[display_ctr].process_number = data_input_FCFS[processing].process_number;
         display[display_ctr].from = elapsed_time;
+        data_input_FCFS[processing].cpu_burst = preempt_min_arrival - elapsed_time   ;
         elapsed_time += data_input_FCFS[processing].cpu_burst;
-        display[display_ctr].to = elapsed_time;
-        display[display_ctr].CPU_burst_left = 0;
-        data_input_FCFS[processing].cpu_burst =0;
         
+        display[display_ctr].to = preempt_min_arrival;
+        display[display_ctr].CPU_burst_left = data_input_FCFS[processing].cpu_burst;
+    
+        printf(" CPU Burst -->%d\n", data_input_FCFS[processing].cpu_burst);
+        printf(" Elapsed_Time -->%d\n\n\n", elapsed_time);
 
         loop_reset();
     }
