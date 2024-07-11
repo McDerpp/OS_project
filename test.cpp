@@ -170,9 +170,10 @@ void simulate_wait() {
         elapsed_time += (min_arrival_time - elapsed_time);
         display[display_ctr].to = elapsed_time;
         // for displaying ctr
-        display_ctr++;
+
     }
 }
+
 
 void check_done() {
     while (data_input_FCFS[ctr].process_number != 0)
@@ -340,40 +341,39 @@ void simulate_SJF()
         //--checks for waiting time--
         //waiting occurs when no process is being executed 
         //elapsed time is less than the min arrival time that has 0 > burst time
-
         
         display[display_ctr].from = elapsed_time;
 
         if (isProcessing == false)
         {
             get_minimum_AT();
-            simulate_wait();           
-         
-            display[display_ctr].CPU_burst_left = 0;
+            simulate_wait();        
 
         }
 
         else if(isPreempt == true){
             //data_input_FCFS[processing].cpu_burst -= data_input_FCFS[preempt].arrival_time - elapsed_time;
             data_input_FCFS[processing].cpu_burst -= data_input_FCFS[preempt].arrival_time - elapsed_time;
-
             elapsed_time += data_input_FCFS[preempt].arrival_time - elapsed_time;
+            display[display_ctr].to = elapsed_time;
         }
         else if (isPreempt == false) {
             elapsed_time += data_input_FCFS[processing].cpu_burst;
-            data_input_FCFS[processing].cpu_burst =0;            
+            data_input_FCFS[processing].cpu_burst =0;        
+            display[display_ctr].to = elapsed_time;
         }
 
         if (isProcessing == true) {
             display[display_ctr].fcfs_data = data_input_FCFS[processing];
             display[display_ctr].process_number = data_input_FCFS[processing].process_number;            
             display[display_ctr].CPU_burst_left = data_input_FCFS[processing].cpu_burst;
+            display[display_ctr].to = elapsed_time;
         }
 
 
 
 
-        display[display_ctr].to = elapsed_time;
+       
 
 
 
@@ -391,14 +391,11 @@ void simulate_SJF()
 
 
 
-
-
-
 int main()
 {
     initialize_input_FCFS();
-     //simulate_FCFS();
-    simulate_SJF();
+    simulate_FCFS();
+    //simulate_SJF();
     display_result();
     return 0;
 }
