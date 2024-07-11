@@ -132,24 +132,26 @@ void get_minimum_AT()
     while (data_input_FCFS[ctr].process_number != 0)
     {
         // checks for the next process that has not yet been processed
-        if (data_input_FCFS[ctr].cpu_burst != 0 && data_input_FCFS[ctr].arrival_time <= min_arrival_time)
-        {
+        if (data_input_FCFS[ctr].cpu_burst != 0){
             // initialization  
             if (isInitialized == false) {
                 isInitialized = true;
                 min_arrival_time = data_input_FCFS[ctr].arrival_time;
                 processing = ctr;
             }
-            // if same arrival time, process number takes precedence
-            else if (min_arrival_time == data_input_FCFS[ctr].arrival_time && processing > ctr) {
-                //do nothing(skip since its checking process to process therefore it is expected that this has more priority number)
+            if (data_input_FCFS[ctr].arrival_time <= min_arrival_time)
+            {                
+                // if same arrival time, process number takes precedence
+                if (min_arrival_time == data_input_FCFS[ctr].arrival_time && processing > ctr) {
+                    //do nothing(skip since its checking process to process therefore it is expected that this has more priority number)
+                }
+                // under normal cirumstances(arrival time is not the same)
+                else if (min_arrival_time != data_input_FCFS[ctr].arrival_time) {
+                    min_arrival_time = data_input_FCFS[ctr].arrival_time;
+                    processing = ctr;
+                }
             }
-            // under normal cirumstances(arrival time is not the same)
-            else if (min_arrival_time != data_input_FCFS[ctr].arrival_time) {
-                min_arrival_time = data_input_FCFS[ctr].arrival_time;
-                processing = ctr;
-            }
-        }
+    }
         // increment counter to move to check the next process 
         ctr++;
     }
@@ -275,9 +277,9 @@ void simulate_SJF()
 {
     int preempt_ctr = 0;
     int preempt_ctr_2 = 0;
-    int waiting_ctr = 0;
     bool isProcessing = false;
     bool isPreempt = false;
+
 
 
     printf("simulating");
@@ -304,15 +306,11 @@ void simulate_SJF()
 
                     }
 
-
                     if (processing == preempt_ctr) {
                         isProcessing = true;
                         processing = preempt_ctr;
                     }
-
-                   
-
-
+                                       
 
                 }
                 
@@ -342,37 +340,47 @@ void simulate_SJF()
         //--checks for waiting time--
         //waiting occurs when no process is being executed 
         //elapsed time is less than the min arrival time that has 0 > burst time
-        if (isProcessing == false)
-            while (data_input_FCFS[waiting_ctr].process_number != 0)
-            {
-                get_minimum_AT();
-                simulate_wait();
-                waiting_ctr++;
-            }
 
+        
         display[display_ctr].from = elapsed_time;
-        display[display_ctr].fcfs_data = data_input_FCFS[processing];
-        display[display_ctr].process_number = data_input_FCFS[processing].process_number;
 
-        if(isPreempt == true){
-            data_input_FCFS[processing].cpu_burst -= data_input_FCFS[preempt].arrival_time - elapsed_time;
-            elapsed_time += data_input_FCFS[preempt].cpu_burst;
+        if (isProcessing == false)
+        {
+            get_minimum_AT();
+            simulate_wait();           
+         
+            display[display_ctr].CPU_burst_left = 0;
+
         }
 
-        if (isPreempt == false) {
+        else if(isPreempt == true){
+            //data_input_FCFS[processing].cpu_burst -= data_input_FCFS[preempt].arrival_time - elapsed_time;
+            data_input_FCFS[processing].cpu_burst -= data_input_FCFS[preempt].arrival_time - elapsed_time;
+
+            elapsed_time += data_input_FCFS[preempt].arrival_time - elapsed_time;
+        }
+        else if (isPreempt == false) {
             elapsed_time += data_input_FCFS[processing].cpu_burst;
             data_input_FCFS[processing].cpu_burst =0;            
         }
 
+        if (isProcessing == true) {
+            display[display_ctr].fcfs_data = data_input_FCFS[processing];
+            display[display_ctr].process_number = data_input_FCFS[processing].process_number;            
+            display[display_ctr].CPU_burst_left = data_input_FCFS[processing].cpu_burst;
+        }
+
+
+
 
         display[display_ctr].to = elapsed_time;
-        display[display_ctr].CPU_burst_left = data_input_FCFS[processing].cpu_burst;
+
+
 
 
         loop_reset();
         preempt_ctr = 0;
         preempt_ctr_2 = 0;
-        waiting_ctr = 0;
         isProcessing = false;
         isPreempt = false;
     }
@@ -389,7 +397,7 @@ void simulate_SJF()
 int main()
 {
     initialize_input_FCFS();
-    // simulate_FCFS();
+     //simulate_FCFS();
     simulate_SJF();
     display_result();
     return 0;
