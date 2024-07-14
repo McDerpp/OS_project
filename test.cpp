@@ -263,38 +263,39 @@ void check_preempt() {
 
             //--initializing on first loop--
             if(list[preempt_ctr_2].cpu_burst != 0)
-                if(elapsed_time< list[preempt_ctr_2].arrival_time)
-                    if (preempt_ctr_2 != processing) {
-                        if (is_preempt == false) {
-                            is_preempt = true;
-                            preempt = preempt_ctr_2;
-                        }
-                        if (is_preempt == true) {
-                                if (list[preempt_ctr_2].arrival_time < list[preempt].arrival_time){
-                                //--without priority--
-                                if (choice != 3)
-                                    if (list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst)
-                                        preempt = preempt_ctr_2;
+                if(list[processing].cpu_burst + elapsed_time > list[preempt_ctr_2].arrival_time)
+                    if (elapsed_time < list[preempt_ctr_2].arrival_time)
+                        if (preempt_ctr_2 != processing) {
+                            if (is_preempt == false) {
+                                is_preempt = true;
+                                preempt = preempt_ctr_2;
+                            }
+                            if (is_preempt == true) {
+                                    if (list[preempt_ctr_2].arrival_time < list[preempt].arrival_time){
+                                    //--without priority--
+                                    if (choice != 3)
+                                        if (list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst)
+                                            preempt = preempt_ctr_2;
 
-                                //--with priority
-                                if (choice == 3) {
-                                    //--comparing priority--
-                                                        // if the process has arrival time less <= elapsed time then it had arrived
-                                    if (list[preempt_ctr_2].priority < list[preempt].priority) {
-                                        preempt = preempt_ctr_2;
-                                        is_preempt = true;
-                                    }
-
-                                    //--comparing cpu burst if same priority--
-                                    else if (list[preempt_ctr_2].priority == list[preempt].priority)
-                                        if (list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst) {
+                                    //--with priority
+                                    if (choice == 3) {
+                                        //--comparing priority--
+                                                            // if the process has arrival time less <= elapsed time then it had arrived
+                                        if (list[preempt_ctr_2].priority < list[preempt].priority) {
                                             preempt = preempt_ctr_2;
                                             is_preempt = true;
                                         }
+
+                                        //--comparing cpu burst if same priority--
+                                        else if (list[preempt_ctr_2].priority == list[preempt].priority)
+                                            if (list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst) {
+                                                preempt = preempt_ctr_2;
+                                                is_preempt = true;
+                                            }
+                                    }
                                 }
                             }
                         }
-                    }
             preempt_ctr_2++;
         }
     }
@@ -336,6 +337,7 @@ void simulate_memory_allocation(){
             display[display_ctr].to = elapsed_time;
         }
         loop_reset();
+
     }
 }
 
