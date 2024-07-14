@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -13,7 +14,6 @@ int elapsed_time = 0;
 
 
 int min_arrival_time = 0;
-
 int preempt = NULL;
 
 int preempt_ctr = 0;
@@ -25,8 +25,10 @@ bool is_initialized_arrived = false;
 
 bool is_processing = false;
 bool is_preempt = false;
-bool is_priority = false;
 bool is_done = false;
+bool again = true;
+
+int choice = 1;
 
 
 
@@ -38,7 +40,6 @@ struct data_input
     int cpu_burst;
     int arrival_time;
     int priority;
-
 };
 
 
@@ -55,10 +56,43 @@ struct data_input list[MAX_INPUT];
 struct data_display display[20];
 
 
-void initialize_input_FCFS()
+void initialize_input()
 {
+    
+    printf("------------------------------------------------------------------------------------------\n");
+    printf("  __  __                                      _    _ _                 _   _             \n");
+    printf(" |  \/  | ___ _ __ ___   ___  _ __ _   _     / \  | | | ___   ___ __ _| |_(_) ___  _ __  \n");
+    printf(" | |\/| |/ _ | '_ ` _ \ / _ \| '__| | | |   / _ \ | | |/ _ \ / __/ _` | __| |/ _ \| '_ \ \n");
+    printf(" | |  | |  __| | | | | | (_) | |  | |_| |  / ___ \| | | (_) | (_| (_| | |_| | (_) | | | |\n");
+    printf(" |_|  |_|\___|_| |_| |_|\___/|_|   \__, | /_/   \_|_|_|\___/ \___\__,_|\__|_|\___/|_| |_|\n");
+    printf("                                   |___/                                                 \n");
+    printf("------------------------------------------------------------------------------------------\n");
+    
 
     int ctr = 0;
+    printf("MEMORY ALLOCATION PROJECT\n");
+    printf("_________________________\n");
+
+
+    printf("1) First Come First Serve \n");
+    printf("2) Shortest Job First With Arrival Time \n");
+    printf("3) Shortest Job First with Arrival Time and Priority Number \n");
+    printf("Choose a mode:");
+    scanf_s("%d", &choice);
+    system("cls");
+    printf(" \n");
+
+    if (choice == 1)
+        printf("First Come First Serve\n");
+
+    else if (choice == 2)
+        printf("Shortest Job First With Arrival Time\n ");
+
+    else if (choice == 3)
+    printf("Shortest Job First with Arrival Time and Priority Number\n");
+
+
+
     printf("Enter number process to input \n");
     scanf_s("%d", &num_input);
 
@@ -73,10 +107,11 @@ void initialize_input_FCFS()
         printf_s("Enter Arrival Time: ");
         scanf_s("%d", &list[ctr].arrival_time);
 
-        if(is_priority==true){
+        if(choice == 3){
             printf_s("Enter Priority: ");
             scanf_s("%d", &list[ctr].priority);
         }
+        printf("---------------------------------------------------------\n");
         printf("\n");
     }
     //indicator for the last element or to check if all the process are is_done
@@ -85,20 +120,11 @@ void initialize_input_FCFS()
     list[ctr + 1].arrival_time = 0;
 }
 
-void initialize_input_SJF()
-{
-}
-
-void initialize_input_PSSJFAT()
-{
-}
-
 void display_result()
 {
     // 0 value is waiting time.
     for (int ctr = 0; ctr < display_ctr; ctr++)
     {
-
         printf("\n\n------------------------ Processing[%d]------------------------", ctr);
         if (display[ctr].fcfs_data.process_number != 100) {
             printf("\n Process Number-> %d", display[ctr].fcfs_data.process_number);
@@ -108,11 +134,8 @@ void display_result()
             printf("\n Process Number-> Waiting... ");
             printf("\n CPU Burst Time left->  Waiting...");
         }
-
         printf("\n Started -> %d", display[ctr].from);
         printf("\n ended --> %d", display[ctr].to);
-
-
 
     }
 }
@@ -130,18 +153,16 @@ void get_minimum_AT()
                 min_arrival_time = list[ctr].arrival_time;
                 processing = ctr;
             }
-            if (list[ctr].arrival_time <= min_arrival_time)
-            {
                 // if same arrival time, process number takes precedence
                 if (min_arrival_time == list[ctr].arrival_time && processing > ctr) {
                     //do nothing(skip since its checking process to process therefore it is expected that this has more priority number)
                 }
                 // under normal cirumstances(arrival time is not the same)
-                else if (min_arrival_time != list[ctr].arrival_time) {
+                else if (min_arrival_time > list[ctr].arrival_time) {
                     min_arrival_time = list[ctr].arrival_time;
                     processing = ctr;
                 }
-            }
+            
         }
         // increment counter to move to check the next process 
         ctr++;
@@ -149,6 +170,9 @@ void get_minimum_AT()
 }
 
 void simulate_wait() {
+    //--checks for waiting time--
+    //waiting occurs when no process is being executed 
+    //elapsed time is less than the min arrival time that has 0 > burst time
     if (elapsed_time < min_arrival_time) {
         // process number 100 signifies a waiting time/gap in between processes(if it occurs)
         display[display_ctr].fcfs_data.process_number = 100;
@@ -166,19 +190,18 @@ void simulate_wait() {
 }
 
 
-void check_is_done() {
+void check_done() {
     while (list[ctr].process_number != 0)
     {
         // checking if one of the process still have CPU burst time
         if (list[ctr].cpu_burst != 0) {
             //  min_arrival_time = list[ctr].arrival_time;
               //incrementing to check the process 1 index ahead(this is to check if the end process indicator(process number 0 is next, then it means this is the last process))
-            ctr++;
+
             break;
         }
         ctr++;
     }
-
     if (list[ctr].process_number == 0)
     {
         is_done = true;
@@ -201,61 +224,6 @@ void loop_reset() {
 
 }
 
-//not efficient, should consider merging the checking of is_done and minimum arrival to have less loops
-void simulate_FCFS()
-{
-    while (!is_done)
-    {
-        check_is_done();
-        get_minimum_AT();
-        simulate_wait();
-
-        //specific behavior for First Come First Serve
-        display[display_ctr].fcfs_data = list[processing];
-        display[display_ctr].process_number = list[processing].process_number;
-        display[display_ctr].from = elapsed_time;
-        elapsed_time += list[processing].cpu_burst;
-        display[display_ctr].to = elapsed_time;
-        display[display_ctr].CPU_burst_left = 0;
-        list[processing].cpu_burst = 0;
-
-
-        loop_reset();
-    }
-}
-
-/*
-void check_arrived() {
-    //--checking if process had arrived--
-    while (list[preempt_ctr].process_number != 0) {
-        if (list[preempt_ctr].cpu_burst != 0) {
-            //checks if the process is still not is_done executing
-            if (elapsed_time >= list[preempt_ctr].arrival_time) {
-                //checks if anything had arrived                                    
-                   //then checks for the cpu burst
-
-                if (list[processing].cpu_burst > list[preempt_ctr].cpu_burst) {
-                    is_processing = true;
-                    processing = preempt_ctr;
-                }
-
-                if (list[processing].cpu_burst == 0) {
-                    is_processing = true;
-                    processing = preempt_ctr;
-                }
-
-                if (processing == preempt_ctr) {
-                    is_processing = true;
-                    processing = preempt_ctr;
-                }
-
-            }
-            printf("now processing -> %d \n", processing);
-        }
-        preempt_ctr++;
-    }
-}
-*/
 
 void check_arrived() {
     //--checking if process had arrived--
@@ -264,20 +232,15 @@ void check_arrived() {
             //checks if the process is still not is_done executing
             if (elapsed_time >= list[preempt_ctr].arrival_time) {
                 is_processing = true;
-
                 if(is_initialized_arrived == false){
                     is_initialized_arrived = true;
                     processing = preempt_ctr;
                 }
-
-
-                if(is_priority == false)
+                if(choice != 3 )
                     if (list[processing].cpu_burst > list[preempt_ctr].cpu_burst) {                        
                         processing = preempt_ctr;
-                    }
-                             
-
-                if (is_priority == true) {
+                    }                            
+                if (choice == 3) {
                         if (list[processing].priority == list[preempt_ctr].priority)                            
                             if (list[processing].cpu_burst < list[preempt_ctr].cpu_burst) {
                                 processing = preempt_ctr;
@@ -286,34 +249,10 @@ void check_arrived() {
                                 processing = preempt_ctr;                            
                 }
             }
-            printf("now processing -> %d \n", processing);
         }
         preempt_ctr++;
     }
 }
-
-
-
-/*
-void check_preempt() {
-    //--checking for potential preempts---
-//preempts process are those that have note arrived yet
-//therefore preepmts only occur if one or more process had already arrived
-    if (is_processing == true) {
-        while (list[preempt_ctr_2].process_number != 0) {
-            if (preempt_ctr_2 != processing)
-                if (elapsed_time < list[preempt_ctr_2].arrival_time)
-                    if (list[preempt].cpu_burst > list[preempt_ctr_2].arrival_time) {
-                        preempt = preempt_ctr_2;
-                        is_preempt = true;
-                        printf("preempting");
-                    }
-            preempt_ctr_2++;
-
-        }
-    }
-}
-*/
 
 void check_preempt() {
  //--checking for potential preempts---
@@ -323,58 +262,53 @@ void check_preempt() {
         while (list[preempt_ctr_2].process_number != 0) {
 
             //--initializing on first loop--
-            if (preempt_ctr_2 != processing) {
-                if (is_initialized_preempt == false) {
-                    is_initialized_preempt = true;
-                    preempt = preempt_ctr_2;
-                }
-
-                //--without priority--
-                if (is_priority = false)
-                    if (elapsed_time < list[preempt_ctr_2].arrival_time) // if the process has arrival time less <= elapsed time then it had arrived
-                        //--comparing cpu burst--
-                        if (list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst) {
-                                preempt = preempt_ctr_2;
-                                is_preempt = true;
-                                printf("preempting");
-                            }
-
-                //--with priority
-                if(is_priority=true)
-                    //--comparing priority--
-                    if (elapsed_time < list[preempt_ctr_2].arrival_time) { // if the process has arrival time less <= elapsed time then it had arrived
-                        if (list[preempt_ctr_2].priority < list[preempt].priority) {
-                            preempt = preempt_ctr_2;
+            if(list[preempt_ctr_2].cpu_burst != 0)
+                if(elapsed_time< list[preempt_ctr_2].arrival_time)
+                    if (preempt_ctr_2 != processing) {
+                        if (is_preempt == false) {
                             is_preempt = true;
+                            preempt = preempt_ctr_2;
                         }
+                        if (is_preempt == true) {
+                                if (list[preempt_ctr_2].arrival_time < list[preempt].arrival_time){
+                                //--without priority--
+                                if (choice != 3)
+                                    if (list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst)
+                                        preempt = preempt_ctr_2;
 
-                        //--comparing cpu burst if same priority--
-                        else if (list[preempt_ctr_2].priority == list[preempt].priority)
-                            if(list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst) {
-                                preempt = preempt_ctr_2;
-                                is_preempt = true;
+                                //--with priority
+                                if (choice == 3) {
+                                    //--comparing priority--
+                                                        // if the process has arrival time less <= elapsed time then it had arrived
+                                    if (list[preempt_ctr_2].priority < list[preempt].priority) {
+                                        preempt = preempt_ctr_2;
+                                        is_preempt = true;
+                                    }
 
+                                    //--comparing cpu burst if same priority--
+                                    else if (list[preempt_ctr_2].priority == list[preempt].priority)
+                                        if (list[preempt].cpu_burst > list[preempt_ctr_2].cpu_burst) {
+                                            preempt = preempt_ctr_2;
+                                            is_preempt = true;
+                                        }
+                                }
+                            }
                         }
                     }
-
-            }
             preempt_ctr_2++;
         }
     }
 }
-void simulate_SJF()
-{
-    printf("simulating");
+void simulate_memory_allocation(){
     while (!is_done)
     {
-        check_is_done();
+
+        check_done();   
         check_arrived();
-        check_preempt();
-
-        //--checks for waiting time--
-        //waiting occurs when no process is being executed 
-        //elapsed time is less than the min arrival time that has 0 > burst time
-
+        // in FCFS no need to preempt
+        if (choice != 1) {
+            check_preempt();
+        }
         display[display_ctr].from = elapsed_time;
 
         if (is_processing == false)
@@ -388,6 +322,7 @@ void simulate_SJF()
             elapsed_time += list[preempt].arrival_time - elapsed_time;
             display[display_ctr].to = elapsed_time;
         }
+
         else if (is_preempt == false) {
             elapsed_time += list[processing].cpu_burst;
             list[processing].cpu_burst = 0;
@@ -405,12 +340,14 @@ void simulate_SJF()
 }
 
 
-
 int main()
 {
-    initialize_input_FCFS();
-    simulate_FCFS();
-    simulate_SJF();
+    while(again == true){
+    initialize_input();    
+    simulate_memory_allocation();
     display_result();
+    printf("\ninput again? \n 1) Input again \n 2)End process\n");
+    scanf_s("%d\n", &choice);
+    }
     return 0;
 }
