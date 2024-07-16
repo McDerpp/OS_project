@@ -35,27 +35,26 @@ int choice = 1;
 
 struct data_input
 {
-    // process_number -> 100 == waiting
-    // process_number -> 0 == is_done
     int process_number;
     int cpu_burst;
     int arrival_time;
     int priority;
+    int finished_at;
 };
 
 
-struct data_display
-{
-    struct data_input fcfs_data;
-    int process_number;
-    int CPU_burst_left;
-    int from;
-    int to;
-};
+// struct data_display
+// {
+//     struct data_input fcfs_data;
+//     int process_number;
+//     int CPU_burst_left;
+//     int from;
+//     int to;
+// };
 
 struct data_input* list = NULL; // Global variable for dynamic array
 int list_size = 0;
-struct data_display display[20];
+// struct data_display display[20];
 
 void initialize_input(){
 
@@ -68,7 +67,7 @@ void initialize_input(){
     printf("2) Shortest Job First With Arrival Time \n");
     printf("3) Shortest Job First with Arrival Time and Priority Number \n");
     printf("Choose a mode:");
-    scanf_s("%d", &choice);
+    scanf("%d", &choice);
     system("cls");
     printf(" \n");
 
@@ -84,7 +83,7 @@ void initialize_input(){
 
 
     printf("Enter number process to input \n");
-    scanf_s("%d", &num_input);
+    scanf("%d", &num_input);
 
     list = (struct data_input*)malloc(num_input * sizeof(struct data_input));
 
@@ -97,41 +96,20 @@ void initialize_input(){
         list[ctr].process_number = ctr + 1;
 
         printf("Enter CPU Burst: ");
-        scanf_s("%d", &list[ctr].cpu_burst);
+        scanf("%d", &list[ctr].cpu_burst);
 
-        printf_s("Enter Arrival Time: ");
-        scanf_s("%d", &list[ctr].arrival_time);
+        printf("Enter Arrival Time: ");
+        scanf("%d", &list[ctr].arrival_time);
 
         if(choice == 3){
-            printf_s("Enter Priority: ");
-            scanf_s("%d", &list[ctr].priority);
+            printf("Enter Priority: ");
+            scanf("%d", &list[ctr].priority);
         }
         printf("---------------------------------------------------------\n");
         printf("\n");
     }
 }
-/*
-void display_result()
-{
-    // 0 value is waiting time.
-    for (int ctr = 0; ctr < display_ctr-1; ctr++)
-    {
-        printf("\n\n------------------------ Processing[%d]------------------------", ctr);
-        if (display[ctr].fcfs_data.process_number != 100) {
-            printf("\n Process Number-> %d", display[ctr].fcfs_data.process_number);
-            printf("\n CPU Burst Time left-> %d", display[ctr].CPU_burst_left);
-        }
-        else {
-            printf("\n Process Number-> Waiting... ");
-            printf("\n CPU Burst Time left->  Waiting...");
-        }
-        printf("\n Started -> %d", display[ctr].from);
-        printf("\n ended --> %d", display[ctr].to);
 
-    }
-}
-
-*/
 
 void display_result(int elapsed_time,int cpu_burst_left,int process_number) {
     if(is_processing == true){
@@ -143,12 +121,6 @@ void display_result(int elapsed_time,int cpu_burst_left,int process_number) {
         printf("---WAITING---\n", cpu_burst_left);
     }
     printf("\n-----------------------------------------------[%d]\n", elapsed_time);
-
-
-
-
-
-
 
 }
 
@@ -175,7 +147,7 @@ void get_minimum_AT()
                     min_arrival_time = list[ctr].arrival_time;
                     processing = ctr;
                 }
-            
+
         }
         // increment counter to move to check the next process 
         ctr++;
@@ -188,19 +160,47 @@ void simulate_wait() {
     //elapsed time is less than the min arrival time that has 0 > burst time
     if (elapsed_time < min_arrival_time) {
         // process number 100 signifies a waiting time/gap in between processes(if it occurs)
-        display[display_ctr].fcfs_data.process_number = 100;
         // it starts at the current elapsed time
-        display[display_ctr].from = elapsed_time;
 
         // elapsed time added with the process next in line to process to simulate waiting
         // suppose current elapsed time is 0 and next process arrival time is 5, therefore
         // 0 + 5 -> elapsed time = 5 and the next process starts at 5(explained in the next part)
         elapsed_time += (min_arrival_time - elapsed_time);
-        display[display_ctr].to = elapsed_time;
         // for displaying ctr
 
     }
 }
+
+
+void print_result(){
+  int tat =0;
+  int wt = 0;
+  int avg_tat =0;
+  int avg_wt = 0;
+
+  for(int ctr =0 ;ctr<num_input;ctr++){
+    printf("\n---------------Proccess %d --------------------", ctr + 1);
+    tat = list[ctr].finished_at - list[ctr].arrival_time;
+    wt = tat - list[ctr].cpu_burst;
+
+    avg_tat += tat;
+    avg_wt += wt;
+    printf("\nArrival Time -> %d ",list[ctr].arrival_time);
+    printf("\nFinished Time -> %d",list[ctr].finished_at);
+    printf("\nTurnaround Time -> %d",tat);
+    printf("\nWaiting Time -> %d",wt);
+  }  
+  avg_tat += tat/num_input;
+  avg_wt += wt/num_input;
+  printf("\nAverage Turnaround Time -> %d",avg_tat);
+  printf("\nAverage Waiting Time -> %d\n\n",avg_wt);
+
+}
+
+
+
+
+
 
 
 void check_done() {
@@ -218,6 +218,7 @@ void check_done() {
     if (num_input == ctr)
     {
         is_done = true;
+        print_result();
     }
     ctr = 0;
 }
@@ -311,6 +312,9 @@ void check_preempt() {
         }
     }
 }
+
+
+
 void simulate_CPU_scheduling(){
 
     printf("\n\n\n");
@@ -324,8 +328,6 @@ void simulate_CPU_scheduling(){
         if (choice != 1) {
             check_preempt();
         }
-        display[display_ctr].from = elapsed_time;
-
         if (is_processing == false)
         {
             get_minimum_AT();
@@ -335,22 +337,17 @@ void simulate_CPU_scheduling(){
         else if (is_preempt == true) {
             list[processing].cpu_burst -= list[preempt].arrival_time - elapsed_time;
             elapsed_time += list[preempt].arrival_time - elapsed_time;
-            //display[display_ctr].to = elapsed_time;
         }
 
         else if (is_preempt == false) {
             elapsed_time += list[processing].cpu_burst;
             list[processing].cpu_burst = 0;
-            //display[display_ctr].to = elapsed_time;
         }
-        /*
-        if (is_processing == true) {
-            display[display_ctr].fcfs_data = list[processing];
-            display[display_ctr].process_number = list[processing].process_number;
-            display[display_ctr].CPU_burst_left = list[processing].cpu_burst;
-            display[display_ctr].to = elapsed_time;
+
+        if(list[processing].cpu_burst==0){
+          list[processing].finished_at = elapsed_time;
         }
-        */
+      
 
         display_result(elapsed_time, list[processing].cpu_burst, list[processing].process_number);
         loop_reset();
@@ -369,11 +366,10 @@ int main()
     simulate_CPU_scheduling();
     //display_result();
     printf("\ninput again? \n 1) Input again \n 2)End process\n");
-    scanf_s("%d\n", &choice);
+    scanf("%d\n", &choice);
     }
     return 0;
 }
-
 
 
 
